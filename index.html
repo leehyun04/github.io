@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>인터넷 클리너 : 꽝을 피해라! (Web Cleaner) - 중독성 기록 갱신 청소 게임</title>
+  <meta name="description" content="인터넷 포털 창의 모든 버튼을 청소하세요! 숨겨진 꽝(지뢰)을 피해 100% 올클리어에 도전하는 중독성 넘치는 원터치 기록 갱신 게임.">
+  <meta name="keywords" content="웹게임, 청소게임, 지뢰찾기, 캐주얼게임, 기록갱신, 네이버패러디, 킬링타임, 브라우저게임">
+  <meta property="og:title" content="인터넷 클리너 : 꽝을 피해라!">
+  <meta property="og:description" content="숨겨진 꽝을 피해 인터넷 창의 모든 버튼을 완벽하게 청소하세요! 당신의 마우스 컨트롤은?">
+  <meta property="og:type" content="website">
+
+  <!-- ================================================================= -->
+  <!-- [구글 애드센스 코드 삽입 위치] -->
+  <!-- 구글 애드센스 승인 후 발급받은 <script> 태그를 아래 주석을 풀고 넣으세요 -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3473005979580804"
+     crossorigin="anonymous"></script>
+  <!-- ================================================================= -->
+
+  <!-- 스크린샷 캡처용 html2canvas 라이브러리 -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <!-- 카카오톡 공유 공식 SDK -->
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2m06WjF27n8bC31j3jK9J7C3Yp4q869U688G2l7bT8v" crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- 폭죽 캔버스 (클리어 시 연출) -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- 토스트 알림 -->
+  <div id="alert-toast" class="alert-toast">알림 메시지</div>
+
+  <!-- 상단 글로벌 네비게이션 헤더 -->
+  <header class="global-header">
+    <a href="#" class="brand-logo nav-tab" data-target="view-game">
+      <span>🧹 웹 클리너</span>
+      <span class="badge">PRO</span>
+    </a>
+    <nav class="nav-tabs">
+      <a class="nav-tab active" data-target="view-game">🎮 게임 플레이</a>
+      <a class="nav-tab" data-target="view-guide">📖 공략 & 가이드</a>
+      <a class="nav-tab" data-target="view-stats">🏆 명예의 전당</a>
+      <a class="nav-tab" data-target="view-about">ℹ️ 사이트 소개</a>
+      <a class="nav-tab" data-target="view-privacy">🔒 개인정보처리방침</a>
+      <a class="nav-tab" data-target="view-terms">📜 이용약관</a>
+      <a class="nav-tab" data-target="view-contact">✉️ 문의하기</a>
+    </nav>
+  </header>
+
+  <!-- 상단 광고 배너 슬롯 -->
+  <aside class="ad-slot-wrapper">
+    <div class="ad-placeholder">
+      <div>[ 구글 애드센스 상단 광고 영역 - 728x90 / Responsive ]</div>
+      <span>(애드센스 승인 후 여기에 광고 단위 코드가 렌더링됩니다)</span>
+    </div>
+  </aside>
+
+  <!-- 메인 콘텐츠 영역 (SPA 뷰) -->
+  <main class="view-container">
+
+    <!-- ==================== VIEW 1: 게임 플레이 ==================== -->
+    <section id="view-game" class="page-view active">
+      <div class="browser-window">
+        
+        <!-- 브라우저 상단 프레임 -->
+        <div class="browser-header">
+          <div class="browser-tabs">
+            <div class="window-dots">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+            </div>
+            <div class="browser-tab">
+              <span class="tab-icon">N</span>
+              <span>NAVUR - 대한민국 1위 포털</span>
+            </div>
+          </div>
+          <div class="browser-toolbar">
+            <div class="nav-arrows">
+              <span>◀</span>
+              <span>▶</span>
+              <span class="restart-trigger" style="cursor:pointer;" title="새로고침">🔄</span>
+            </div>
+            <div class="url-bar">
+              <span>🔒</span>
+              <span class="url-text">https://www.navur.com/cleaner-zone</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 게임 HUD 컨트롤러 -->
+        <div class="game-hud">
+          <div class="hud-left">
+            <!-- 난이도 선택 -->
+            <div class="mode-selector">
+              <button class="mode-btn" data-mode="easy">초보 알바 (20개)</button>
+              <button class="mode-btn active" data-mode="normal">정규직 (32개)</button>
+              <button class="mode-btn" data-mode="hard">청소의 신 (전체)</button>
+              <button class="mode-btn" data-mode="infinite">무한 챌린지 ♾️</button>
+            </div>
+            <span id="floor-badge" class="badge-success" style="display:none;"><span id="floor-text">1층</span></span>
+            <span id="shield-badge" class="badge-success" style="background:#dbeafe; color:#1d4ed8; display:none;">💉 쉴드 활성화</span>
+          </div>
+
+          <div class="hud-stats">
+            <div class="stat-pill danger">
+              <span>남은 버튼:</span>
+              <strong id="remain-count">0</strong>개
+            </div>
+            <div class="stat-pill">
+              <span>청소율:</span>
+              <strong id="progress-percent">0%</strong>
+            </div>
+            <div class="stat-pill">
+              <span>시간:</span>
+              <strong id="timer-text">0.0s</strong>
+            </div>
+            <div class="stat-pill">
+              <span>콤보:</span>
+              <strong id="combo-text">0</strong>
+            </div>
+          </div>
+
+          <div class="hud-right">
+            <button id="mute-btn" class="action-btn">🔊 소리 끄기</button>
+            <button class="action-btn primary restart-trigger">🔄 다시하기</button>
+          </div>
+        </div>
+
+        <!-- 실시간 진행도 게이지 바 -->
+        <div class="progress-container">
+          <div id="progress-bar" class="progress-bar-fill"></div>
+        </div>
+
+        <!-- 포털 인터랙티브 청소 캔버스 -->
+        <div id="portal-content" class="portal-canvas">
+
+          <!-- 1. 포털 헤더 (로고 & 검색창) -->
+          <div class="portal-header">
+            <div class="navur-logo clean-target" title="로고 클릭">NAVUR</div>
+            <div class="search-box-wrap clean-target">
+              <div class="search-input-fake">오늘 저녁 퇴근하고 뭐 먹지?</div>
+              <div class="search-btn-icon">🔍</div>
+            </div>
+            <div class="clean-target" style="background:#f1f5f9; padding:0.4rem 0.8rem; border-radius:0.5rem; font-size:0.8rem; font-weight:bold;">
+              ✨ AI 클린검색
+            </div>
+          </div>
+
+          <!-- 2. 바로가기 아이콘 10종 -->
+          <div class="service-icons-grid">
+            <div class="service-icon-card clean-target">
+              <div class="icon-img-box" style="background:#e0f2fe; color:#0284c7;">✉️</div>
+              <span class="service-label">메일 (99+)</span>
+            </div>
+            <div class="service-icon-card clean-target">
+              <div class="icon-img-box" style="background:#dcfce7; color:#16a34a;">☕</div>
+              <span class="service-label">카페</span>
+            </div>
+            <div class="service-icon-card clean-target">
+              <div class="icon-img-box" style="background:#fef3c7; color:#d97706;">📝</div>
+              <span class="service-label">블로그</span>
+            </div>
+            <div class="service-icon-card clean-target">
+              <div class="icon-img-box" style="background:#fce7f3; color:#db2777;">🛍️</div>
+              <span class="service-label">쇼핑</span>
+            </div>
+            <div class="service-icon-card clean-target">
+              <div class="icon-img-box" style="background:#ede9fe; color:#7c3aed;">📰</div>
+              <span class="service-label">뉴스</span>
+            </div>
+            <div class="service-icon-card clean-target">
+              <div class="icon-img-box" style="background:#fee2e2; color:#dc2626;">📈</div>
+              <span class="service-label">증권</span>
+            </div>
+            <div class="service-icon-card clean-target">
+              <div class="icon-img-box" style="background:#ffedd5; color:#ea580c;">🏠</div>
+              <span class="service-label">부동산</span>
+            </div>
+            <div class="service-icon-card clean-target">
+              <div class="icon-img-box" style="background:#ccfbf1; color:#0d9488;">🗺️</div>
+              <span class="service-label">지도</span>
+            </div>
+            <div class="service-icon-card clean-target">
+              <div class="icon-img-box" style="background:#f3e8ff; color:#9333ea;">🎨</div>
+              <span class="service-label">웹툰</span>
+            </div>
+            <div class="service-icon-card clean-target">
+              <div class="icon-img-box" style="background:#e2e8f0; color:#475569;">🎮</div>
+              <span class="service-label">치지직</span>
+            </div>
+          </div>
+
+          <!-- 3. 메인 배너 & 2열 구성 -->
+          <div class="portal-main-grid">
+            
+            <!-- 왼쪽 컬럼 (배너 + 뉴스) -->
+            <div>
+              <!-- 큰 이벤트 배너 -->
+              <div class="portal-banner clean-target">
+                <div>
+                  <span style="background:rgba(255,255,255,0.25); padding:0.2rem 0.5rem; border-radius:4px; font-size:0.75rem;">초특가 광고</span>
+                  <h3 style="font-size:1.15rem; margin-top:0.3rem;">모든 업무 월 4만원에 완전 자동화!</h3>
+                  <p style="font-size:0.8rem; opacity:0.9;">100% 웹기반 업무 관리 솔루션</p>
+                </div>
+                <button style="background:#fff; color:#1d4ed8; border:none; padding:0.4rem 0.8rem; border-radius:9999px; font-weight:bold; font-size:0.8rem;">더 알아보기 ➔</button>
+              </div>
+
+              <!-- 뉴스 스탠드 카드 -->
+              <div class="portal-card">
+                <div class="card-header-tabs">
+                  <span class="tab-pill active clean-target">언론사편집</span>
+                  <span class="tab-pill clean-target">엔터</span>
+                  <span class="tab-pill clean-target">스포츠</span>
+                  <span class="tab-pill clean-target">경제</span>
+                  <span class="tab-pill clean-target">쇼핑투데이</span>
+                </div>
+                <div class="news-list">
+                  <div class="news-item clean-target">
+                    <span class="badge-news">속보</span>
+                    <span>세계일보: 에베레스트 빙하 붕괴... 전 세계 기후 비상 대책 회의</span>
+                  </div>
+                  <div class="news-item clean-target">
+                    <span class="badge-news">단독</span>
+                    <span>중앙일보: 20일째 야근하던 김대리, 마우스 청소 게임으로 칼퇴 성공</span>
+                  </div>
+                  <div class="news-item clean-target">
+                    <span class="badge-news">인기</span>
+                    <span>조선일보: 전설의 로봇청소기, 사람까지 빨아들이는 신기술 특허</span>
+                  </div>
+                  <div class="news-item clean-target">
+                    <span class="badge-news">IT</span>
+                    <span>한겨레: 구글 애드센스 고수익 비결, 가치 있는 웹 콘텐츠에 있다</span>
+                  </div>
+                  <div class="news-item clean-target">
+                    <span class="badge-news">라이프</span>
+                    <span>동아일보: 가을 인생샷 명소 베스트 10 공개! 핑크뮬리 스팟</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 서브 2차 배너 -->
+              <div class="portal-banner green clean-target">
+                <div>
+                  <h4 style="font-size:1rem;">☕ 오늘 가입 시 아메리카노 100% 무료 증정!</h4>
+                  <p style="font-size:0.75rem; opacity:0.9;">지금 바로 선착순 쿠폰을 다운로드하세요.</p>
+                </div>
+                <span style="font-size:1.5rem;">🎁</span>
+              </div>
+            </div>
+
+            <!-- 오른쪽 컬럼 (로그인 + 날씨 + 쇼핑) -->
+            <div>
+              <!-- 로그인 박스 -->
+              <div class="login-card">
+                <p style="font-size:0.85rem; color:#475569;">네이뻥을 더 안전하고 편리하게 이용하세요</p>
+                <div class="login-btn-large clean-target">
+                  NAVUR 로그인
+                </div>
+                <div class="login-sub-links">
+                  <span class="clean-target">아이디 찾기</span>
+                  <span>|</span>
+                  <span class="clean-target">비밀번호 찾기</span>
+                  <span>|</span>
+                  <span class="clean-target">회원가입</span>
+                </div>
+              </div>
+
+              <!-- 날씨 & 증시 위젯 -->
+              <div class="widget-grid">
+                <div class="widget-card clean-target">
+                  <div style="font-size:0.75rem; color:#64748b;">서울 날씨</div>
+                  <div style="font-size:1.1rem; font-weight:800; color:#0284c7; margin-top:0.2rem;">☀️ 24℃ 맑음</div>
+                  <div style="font-size:0.7rem; color:#94a3b8;">미세먼지 보통 (35)</div>
+                </div>
+                <div class="widget-card clean-target">
+                  <div style="font-size:0.75rem; color:#64748b;">코스피 (KOSPI)</div>
+                  <div style="font-size:1.1rem; font-weight:800; color:#dc2626; margin-top:0.2rem;">▲ 2,758.32</div>
+                  <div style="font-size:0.7rem; color:#dc2626;">+18.45 (+0.67%)</div>
+                </div>
+              </div>
+
+              <!-- 실시간 타임딜 쇼핑 카드 -->
+              <div class="portal-card" style="margin-top:1rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                  <span style="font-size:0.85rem; font-weight:bold; color:#db2777;">🔥 타임딜 특가</span>
+                  <span class="clean-target" style="font-size:0.75rem; color:#64748b;">더보기 ➔</span>
+                </div>
+                <div class="clean-target" style="display:flex; gap:0.6rem; align-items:center; padding:0.5rem; background:#fdf2f8; border-radius:0.5rem; margin-bottom:0.5rem;">
+                  <span style="font-size:1.5rem;">📱</span>
+                  <div>
+                    <div style="font-size:0.8rem; font-weight:600;">최신 무선 노이즈캔슬링 헤드폰</div>
+                    <div style="font-size:0.85rem; font-weight:800; color:#db2777;">49% 할인 129,000원</div>
+                  </div>
+                </div>
+                <div class="clean-target" style="display:flex; gap:0.6rem; align-items:center; padding:0.5rem; background:#f0fdf4; border-radius:0.5rem;">
+                  <span style="font-size:1.5rem;">👟</span>
+                  <div>
+                    <div style="font-size:0.8rem; font-weight:600;">초경량 쿠셔닝 러닝화</div>
+                    <div style="font-size:0.85rem; font-weight:800; color:#16a34a;">35% 할인 59,000원</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 4. 하단 서비스 링크들 (푸터 버튼) -->
+          <div style="display:flex; justify-content:center; gap:0.75rem; flex-wrap:wrap; margin-top:1.5rem; padding-top:1rem; border-top:1px solid #e2e8f0;">
+            <span class="clean-target" style="font-size:0.75rem; color:#64748b;">회사소개</span>
+            <span class="clean-target" style="font-size:0.75rem; color:#64748b;">인재채용</span>
+            <span class="clean-target" style="font-size:0.75rem; color:#64748b;">제휴제안</span>
+            <span class="clean-target" style="font-size:0.75rem; color:#64748b;">이용약관</span>
+            <span class="clean-target" style="font-size:0.75rem; color:#64748b;">개인정보처리방침</span>
+            <span class="clean-target" style="font-size:0.75rem; color:#64748b;">청소년보호정책</span>
+            <span class="clean-target" style="font-size:0.75rem; color:#64748b;">고객센터</span>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 2: 게임 가이드 & 공략 팁 ==================== -->
+    <section id="view-guide" class="page-view">
+      <article class="article-container">
+        <h1>📖 인터넷 클리너 : 완벽 청소 공략 가이드</h1>
+        <p>
+          <strong>웹 클리너(Web Cleaner)</strong>는 복잡하고 어지러운 포털 사이트 화면의 모든 버튼을 하나씩 눌러 지워나가면서, 무작위로 숨겨진 <strong>'꽝(지뢰)'</strong>을 피해 화면을 100% 순백으로 청소하는 고도의 심리전 & 반응속도 게임입니다.
+        </p>
+
+        <h2>🎮 게임 기본 규칙 및 플레이 방법</h2>
+        <ul>
+          <li><strong>조작 방법</strong>: 마우스 좌클릭 또는 스마트폰 화면 터치로 원하는 요소를 누릅니다.</li>
+          <li><strong>클리어 조건</strong>: 화면에 존재하는 모든 안전한 버튼을 꽝 없이 전부 누르면 승리합니다.</li>
+          <li><strong>패배 조건</strong>: 꽝(지뢰)이 숨겨진 버튼을 누르면 비상 사이렌과 함께 즉시 게임 오버됩니다.</li>
+          <li><strong>콤보 시스템</strong>: 연속으로 빠르게 안전 버튼을 누르면 콤보 점수가 오르고 경쾌한 도-레-미-파 음계 상승 사운드가 재생됩니다.</li>
+        </ul>
+
+        <h2>⚡ 특수 아이템 활용 전략</h2>
+        <p>게임을 진행하다 보면 특정 안전 버튼에서 강력한 서포트 아이템이 무작위로 등장합니다:</p>
+        <ul>
+          <li>🔍 <strong>돋보기 아이템</strong>: 아직 누르지 않은 안전한 버튼 1개를 황금빛으로 3초간 깜빡여 알려줍니다. 발견 즉시 눌러주세요!</li>
+          <li>💉 <strong>백신 쉴드 아이템</strong>: 꽝을 밟아도 1회에 한해 게임 오버를 막아주는 방어막을 획득합니다. 후반부 심리전에 매우 유용합니다.</li>
+        </ul>
+
+        <h2>🏆 고득점 & 최단 시간 클리어 팁</h2>
+        <ol style="padding-left:1.5rem; color:#475569; line-height:1.8;">
+          <li><strong>외곽부터 차례대로 공략하기</strong>: 상단 로고나 하단 푸터 링크처럼 시각적으로 눈에 잘 띄는 영역부터 청소해 나가면 남은 버튼 위치를 파악하기 쉽습니다.</li>
+          <li><strong>남은 버튼 3개 이하의 심장박동 구간</strong>: 안전 버튼이 3개 이하로 남으면 긴장감 심장박동 사운드가 재생됩니다. 이때 서두르지 말고 침착하게 남은 안전 버튼을 선택하세요.</li>
+          <li><strong>무한 챌린지 모드</strong>: 1층을 클리어할 때마다 버튼 수와 꽝의 개수가 늘어납니다. 연속으로 몇 층까지 도달할 수 있는지 도전해 보세요!</li>
+        </ol>
+      </article>
+    </section>
+
+    <!-- ==================== VIEW 3: 명예의 전당 & 내 기록실 ==================== -->
+    <section id="view-stats" class="page-view">
+      <div class="article-container">
+        <h1>🏆 명예의 전당 & 내 기록실</h1>
+        <p>브라우저 로컬 저장소에 기록된 나의 플레이 통계와 최고 기록입니다.</p>
+
+        <!-- 핵심 요약 카드 그리드 -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:1rem; margin:1.5rem 0;">
+          <div style="background:#f8fafc; padding:1.25rem; border-radius:0.75rem; border:1px solid #e2e8f0; text-align:center;">
+            <div style="font-size:0.8rem; color:#64748b;">총 플레이 횟수</div>
+            <div id="stat-total-games" style="font-size:1.8rem; font-weight:800; color:#0f172a; margin-top:0.25rem;">0</div>
+          </div>
+          <div style="background:#f0fdf4; padding:1.25rem; border-radius:0.75rem; border:1px solid #bbf7d0; text-align:center;">
+            <div style="font-size:0.8rem; color:#166534;">총 올클리어 성공</div>
+            <div id="stat-total-clears" style="font-size:1.8rem; font-weight:800; color:#16a34a; margin-top:0.25rem;">0</div>
+          </div>
+          <div style="background:#eff6ff; padding:1.25rem; border-radius:0.75rem; border:1px solid #bfdbfe; text-align:center;">
+            <div style="font-size:0.8rem; color:#1e40af;">청소 성공률</div>
+            <div id="stat-win-rate" style="font-size:1.8rem; font-weight:800; color:#2563eb; margin-top:0.25rem;">0%</div>
+          </div>
+          <div style="background:#fdf4ff; padding:1.25rem; border-radius:0.75rem; border:1px solid #f5d0fe; text-align:center;">
+            <div style="font-size:0.8rem; color:#86198f;">총 청소한 버튼 수</div>
+            <div id="stat-total-cleaned" style="font-size:1.8rem; font-weight:800; color:#a855f7; margin-top:0.25rem;">0개</div>
+          </div>
+          <div style="background:#fffbeb; padding:1.25rem; border-radius:0.75rem; border:1px solid #fde68a; text-align:center;">
+            <div style="font-size:0.8rem; color:#92400e;">최고 연속 콤보</div>
+            <div id="stat-max-combo" style="font-size:1.8rem; font-weight:800; color:#d97706; margin-top:0.25rem;">0회</div>
+          </div>
+        </div>
+
+        <h2>⏱️ 난이도별 최단 클리어 기록</h2>
+        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:1rem; margin-bottom:2rem;">
+          <div style="background:#f8fafc; padding:1rem; border-radius:0.5rem; text-align:center; border:1px solid #e2e8f0;">
+            <div style="font-size:0.85rem; font-weight:bold; color:#16a34a;">초보 알바 (Easy)</div>
+            <div id="best-easy" style="font-size:1.3rem; font-weight:800; color:#0f172a; margin-top:0.25rem;">-</div>
+          </div>
+          <div style="background:#f8fafc; padding:1rem; border-radius:0.5rem; text-align:center; border:1px solid #e2e8f0;">
+            <div style="font-size:0.85rem; font-weight:bold; color:#2563eb;">정규직 (Normal)</div>
+            <div id="best-normal" style="font-size:1.3rem; font-weight:800; color:#0f172a; margin-top:0.25rem;">-</div>
+          </div>
+          <div style="background:#f8fafc; padding:1rem; border-radius:0.5rem; text-align:center; border:1px solid #e2e8f0;">
+            <div style="font-size:0.85rem; font-weight:bold; color:#dc2626;">청소의 신 (Hard)</div>
+            <div id="best-hard" style="font-size:1.3rem; font-weight:800; color:#0f172a; margin-top:0.25rem;">-</div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+          <h2>📜 최근 플레이 기록</h2>
+          <button id="reset-stats-btn" style="background:#fee2e2; color:#dc2626; border:none; padding:0.35rem 0.75rem; border-radius:0.375rem; font-size:0.8rem; font-weight:bold; cursor:pointer;">
+            기록 초기화
+          </button>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; text-align:left;">
+            <thead>
+              <tr style="background:#f1f5f9; border-bottom:2px solid #cbd5e1; font-size:0.8rem; color:#475569;">
+                <th style="padding:0.5rem 0.75rem;">일시</th>
+                <th style="padding:0.5rem 0.75rem;">모드</th>
+                <th style="padding:0.5rem 0.75rem;">결과</th>
+                <th style="padding:0.5rem 0.75rem;">청소 진행도</th>
+                <th style="padding:0.5rem 0.75rem;">소요 시간</th>
+                <th style="padding:0.5rem 0.75rem;">비고</th>
+              </tr>
+            </thead>
+            <tbody id="history-tbody">
+              <!-- JS 동적 렌더링 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 4: 사이트 소개 ==================== -->
+    <section id="view-about" class="page-view">
+      <article class="article-container">
+        <h1>ℹ️ 사이트 소개 (About Web Cleaner)</h1>
+        <p>
+          <strong>웹 클리너(Web Cleaner)</strong>는 일상에서 매일 접하는 인터넷 포털 웹사이트를 유쾌하게 재해석한 <strong>HTML5 기반 캐주얼 인터랙티브 웹 게임</strong>입니다.
+        </p>
+        <h2>💡 기획 배경 및 철학</h2>
+        <p>
+          수많은 정보와 배너, 광고로 가득 찬 현대의 복잡한 웹페이지를 하나씩 '청소'해 나가며 얻는 시각적 카타르시스와, 단 한 번의 실수로 터지는 '꽝'의 쫄깃한 긴장감을 결합하여 누구나 설치 없이 브라우저에서 바로 즐길 수 있는 미니멀한 엔터테인먼트를 제공합니다.
+        </p>
+        <h2>🛠️ 기술적 특징</h2>
+        <ul>
+          <li><strong>무설치 & 즉시 실행</strong>: 별도의 앱 설치나 플러그인 없이 데스크톱과 모바일 브라우저에서 60fps로 매끄럽게 동작합니다.</li>
+          <li><strong>Web Audio API 사운드 합성</strong>: 외장 음원 파일 다운로드 지연 없이 브라우저 내장 오실레이터로 고품질 타격음과 멜로디를 합성하여 0.01초의 딜레이도 없는 찰진 손맛을 선사합니다.</li>
+          <li><strong>개인정보 비수집</strong>: 플레이어의 모든 점수와 통계는 오직 사용자의 브라우저 로컬 저장소(LocalStorage)에만 안전하게 보관됩니다.</li>
+        </ul>
+      </article>
+    </section>
+
+    <!-- ==================== VIEW 5: 개인정보처리방침 (AdSense 필수) ==================== -->
+    <section id="view-privacy" class="page-view">
+      <article class="article-container">
+        <h1>🔒 개인정보처리방침 (Privacy Policy)</h1>
+        <p>본 사이트(이하 "웹 클리너")는 사용자의 개인정보를 매우 소중하게 생각하며, 관련 법령을 준수합니다.</p>
+        
+        <h2>1. 수집하는 개인정보 항목</h2>
+        <p>본 사이트는 회원가입이나 개인 식별 정보(이름, 주민등록번호, 연락처 등)를 요구하거나 서버에 수집하지 않습니다. 게임 진행 상황 및 최고 점수는 전적으로 이용자의 웹 브라우저 로컬 저장소(LocalStorage)에만 기록됩니다.</p>
+
+        <h2>2. 쿠키(Cookie) 및 제3자 광고 (Google AdSense) 관련 고지</h2>
+        <p>본 웹사이트는 트래픽 분석 및 맞춤형 광고 게재를 위해 Google 등 제3자 제공업체의 서비스를 이용할 수 있습니다:</p>
+        <ul>
+          <li>Google을 포함한 제3자 광고 제공업체는 쿠키를 사용하여 이용자의 본 사이트 및 다른 웹사이트 방문 기록을 바탕으로 광고를 게재합니다.</li>
+          <li>Google의 DART 쿠키 사용을 통해 Google과 파트너는 인터넷 방문 기록을 바탕으로 맞춤형 광고를 제공할 수 있습니다.</li>
+          <li>사용자는 <a href="https://www.google.com/settings/ads" target="_blank" style="color:#2563eb;">Google 광고 설정</a>을 방문하여 맞춤형 광고에 사용되는 쿠키를 비활성화할 수 있습니다.</li>
+        </ul>
+
+        <h2>3. 로그 데이터</h2>
+        <p>웹 서버는 사이트 안정성 유지와 보안을 위해 표준적인 접속 로그(접속 IP 주소, 브라우저 유형, 방문 시간 등)를 일시적으로 기록할 수 있으며, 이는 통계 목적으로만 활용됩니다.</p>
+      </article>
+    </section>
+
+    <!-- ==================== VIEW 6: 이용약관 (AdSense 필수) ==================== -->
+    <section id="view-terms" class="page-view">
+      <article class="article-container">
+        <h1>📜 서비스 이용약관 (Terms of Service)</h1>
+        <h2>제1조 (목적)</h2>
+        <p>본 약관은 "웹 클리너" 웹사이트가 제공하는 무료 캐주얼 웹 게임 서비스의 이용 조건 및 절차에 관한 기본적인 사항을 규정함을 목적으로 합니다.</p>
+
+        <h2>제2조 (서비스의 제공 및 변경)</h2>
+        <p>본 서비스는 누구나 무료로 이용할 수 있으며, 서비스의 개선이나 기술적 필요에 따라 게임의 규칙, UI, 콘텐츠가 사전 고지 없이 업데이트될 수 있습니다.</p>
+
+        <h2>제3조 (패러디 및 저작권에 관한 고지)</h2>
+        <p>본 게임의 인터페이스와 그래픽은 풍자와 오락을 목적으로 한 창작 패러디 콘텐츠이며, 실제 특정 기업이나 포털 서비스의 상표를 무단 도용하거나 비방할 목적이 없습니다.</p>
+
+        <h2>제4조 (면책 조항)</h2>
+        <p>본 사이트는 무료로 제공되는 오락 서비스로서, 서비스 이용 중 발생할 수 있는 데이터 손실이나 일시적 중단에 대해 법적 책임을 지지 않습니다.</p>
+      </article>
+    </section>
+
+    <!-- ==================== VIEW 7: 문의하기 ==================== -->
+    <section id="view-contact" class="page-view">
+      <article class="article-container">
+        <h1>✉️ 개발자 문의 & 피드백 (Contact Us)</h1>
+        <p>버그 제보, 게임 개선 아이디어, 제휴 문의는 언제든지 환영합니다.</p>
+        
+        <form id="contact-form" style="max-width:560px; margin-top:1.5rem; display:flex; flex-direction:column; gap:1rem;">
+          <div>
+            <label style="display:block; font-size:0.85rem; font-weight:bold; margin-bottom:0.35rem;">이름 / 닉네임</label>
+            <input type="text" required placeholder="예: 청소마스터" style="width:100%; padding:0.6rem; border:1px solid #cbd5e1; border-radius:0.375rem;">
+          </div>
+          <div>
+            <label style="display:block; font-size:0.85rem; font-weight:bold; margin-bottom:0.35rem;">이메일 주소</label>
+            <input type="email" required placeholder="example@domain.com" style="width:100%; padding:0.6rem; border:1px solid #cbd5e1; border-radius:0.375rem;">
+          </div>
+          <div>
+            <label style="display:block; font-size:0.85rem; font-weight:bold; margin-bottom:0.35rem;">문의 및 피드백 내용</label>
+            <textarea required rows="4" placeholder="게임 버그 제보나 재밌는 꽝 아이디어를 자유롭게 적어주세요!" style="width:100%; padding:0.6rem; border:1px solid #cbd5e1; border-radius:0.375rem;"></textarea>
+          </div>
+          <button type="submit" style="background:var(--primary); color:#fff; border:none; padding:0.75rem; border-radius:0.375rem; font-weight:bold; font-size:1rem; cursor:pointer;">
+            의견 보내기
+          </button>
+        </form>
+      </article>
+    </section>
+
+  </main>
+
+  <!-- 하단 광고 배너 슬롯 -->
+  <aside class="ad-slot-wrapper">
+    <div class="ad-placeholder">
+      <div>[ 구글 애드센스 하단 광고 영역 - 728x90 / Responsive ]</div>
+      <span>(애드센스 승인 후 여기에 광고 단위 코드가 렌더링됩니다)</span>
+    </div>
+  </aside>
+
+  <!-- 글로벌 푸터 -->
+  <footer class="global-footer">
+    <div class="footer-links">
+      <a class="nav-tab" data-target="view-guide">공략가이드</a>
+      <a class="nav-tab" data-target="view-stats">내기록실</a>
+      <a class="nav-tab" data-target="view-about">사이트소개</a>
+      <a class="nav-tab" data-target="view-privacy">개인정보처리방침</a>
+      <a class="nav-tab" data-target="view-terms">이용약관</a>
+      <a class="nav-tab" data-target="view-contact">문의하기</a>
+    </div>
+    <p>© 2026 Web Cleaner. All rights reserved. 본 게임은 엔터테인먼트 목적의 패러디 창작물입니다.</p>
+  </footer>
+
+  <!-- ==================== MODAL 1: 게임 오버 (꽝 밟음) ==================== -->
+  <div id="game-over-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      
+      <!-- 캡처 대상 인증 카드 영역 -->
+      <div class="capture-card" style="padding: 1.25rem; background:#ffffff; border-radius:0.75rem; border:2px solid #fee2e2;">
+        <div style="font-size:3.5rem; margin-bottom:0.25rem;">💣💥</div>
+        <div style="font-size:0.75rem; font-weight:bold; color:#94a3b8; letter-spacing:1px; margin-bottom:0.25rem;">WEB CLEANER CERTIFICATE</div>
+        <h2 class="modal-title fail" style="margin-bottom:0.5rem;">대참사! 꽝을 밟았습니다!</h2>
+        <p id="game-over-reason" style="font-size:0.9rem; color:#ef4444; font-weight:600; white-space:pre-line; line-height:1.5; margin:0.5rem 0;">
+          부장님이 화면을 보고 계십니다!
+        </p>
+
+        <div class="result-box" style="margin: 0.75rem 0;">
+          <div class="result-row">
+            <span>청소한 버튼 수:</span>
+            <strong id="game-over-cleaned">0개 / 0개</strong>
+          </div>
+          <div class="result-row">
+            <span>청소 달성률:</span>
+            <strong id="game-over-percent" style="color:#ef4444; font-size:1.05rem;">0%</strong>
+          </div>
+          <div class="result-row">
+            <span>버틴 시간:</span>
+            <strong id="game-over-time">0.0초</strong>
+          </div>
+          <div class="result-row">
+            <span>최고 콤보:</span>
+            <strong id="game-over-combo">0회</strong>
+          </div>
+        </div>
+
+        <div style="font-size:0.75rem; color:#94a3b8; text-align:center;">
+          🧹 웹 클리너 : 꽝을 피해 인터넷 창을 청소하세요!
+        </div>
+      </div>
+
+      <!-- 모달 내 광고 영역 플레이스홀더 -->
+      <div style="background:#f1f5f9; border:1px dashed #cbd5e1; padding:0.4rem; border-radius:0.375rem; font-size:0.75rem; color:#64748b; margin:0.75rem 0;">
+        [ 광고 영역 (모달 전면/배너) ]
+      </div>
+
+      <!-- 액션 버튼들 (스크린샷 복사 / 카톡 공유 / 다시하기) -->
+      <div class="modal-actions" style="flex-direction:column; gap:0.5rem;">
+        <div style="display:flex; gap:0.5rem;">
+          <button class="modal-btn screenshot-btn" data-target-modal="game-over-modal" style="background:#3b82f6; color:#fff; font-size:0.85rem;">
+            📸 스크린샷 복사 (Ctrl+V용)
+          </button>
+          <button class="modal-btn kakao-share-btn" style="background:#fee500; color:#181600; font-size:0.85rem;">
+            🟡 카톡 공유
+          </button>
+        </div>
+        <button class="modal-btn primary restart-trigger" style="width:100%;">
+          🔄 다시 도전하기
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 2: 100% 올클리어 (승리) ==================== -->
+  <div id="clear-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+
+      <!-- 캡처 대상 인증 카드 영역 -->
+      <div class="capture-card" style="padding: 1.25rem; background:#ffffff; border-radius:0.75rem; border:2px solid #bbf7d0;">
+        <div style="font-size:3.5rem; margin-bottom:0.25rem;">👑✨</div>
+        <div style="font-size:0.75rem; font-weight:bold; color:#94a3b8; letter-spacing:1px; margin-bottom:0.25rem;">CLEAN MASTER CERTIFICATE</div>
+        <h2 class="modal-title clear" style="margin-bottom:0.5rem;">완벽 청소 100% 올클리어!</h2>
+        <p style="font-size:0.95rem; color:#10b981; font-weight:700; margin-bottom:0.5rem;">
+          꽝을 전부 피해 화면의 모든 버튼을 깨끗하게 청소했습니다!
+        </p>
+
+        <div class="result-box" style="margin: 0.75rem 0;">
+          <div class="result-row">
+            <span>최종 클리어 타임:</span>
+            <strong id="clear-time" style="color:#059669; font-size:1.2rem;">0.0초</strong>
+          </div>
+          <div class="result-row">
+            <span>청소한 총 버튼:</span>
+            <strong id="clear-cleaned">0개</strong>
+          </div>
+          <div class="result-row">
+            <span>달성 콤보:</span>
+            <strong id="clear-combo">0회</strong>
+          </div>
+          <div class="result-row">
+            <span>부여된 칭호:</span>
+            <strong style="color:#8b5cf6;">🏆 마우스 클릭의 신</strong>
+          </div>
+        </div>
+
+        <div style="font-size:0.75rem; color:#94a3b8; text-align:center;">
+          🧹 웹 클리너 : 당신도 꽝을 피해 올클리어에 도전해보세요!
+        </div>
+      </div>
+
+      <!-- 액션 버튼들 -->
+      <div class="modal-actions" style="flex-direction:column; gap:0.5rem; margin-top:1rem;">
+        <div style="display:flex; gap:0.5rem;">
+          <button class="modal-btn screenshot-btn" data-target-modal="clear-modal" style="background:#3b82f6; color:#fff; font-size:0.85rem;">
+            📸 스크린샷 복사 (Ctrl+V용)
+          </button>
+          <button class="modal-btn kakao-share-btn" style="background:#fee500; color:#181600; font-size:0.85rem;">
+            🟡 카톡 공유
+          </button>
+        </div>
+        <button id="next-floor-btn" class="modal-btn primary" style="display:none; background:#8b5cf6; width:100%;">다음 층 도전 ➔</button>
+        <button class="modal-btn primary restart-trigger" style="width:100%;">🔄 또 한판 하기</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 스크립트 로드 -->
+  <script src="js/audio.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/game-engine.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
